@@ -1,0 +1,22 @@
+{
+  "name": "arminsam/db-data-importer",
+  "description": "A handy tool to import selective data from production database into you local environment db",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Armin Sam",
+      "email": "armin.sm64@gmail.com"
+    }
+  ],
+  "require": {
+    "php": ">=5.5.9"
+  },
+  "bin": [
+    "bin/db-importer"
+  ],
+  "autoload": {
+    "psr-4": {
+      "DataImporter\\": "src/DataImporter"
+    }
+  }
+}
