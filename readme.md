@@ -135,22 +135,22 @@ Lastly, you can start using the tool in one of the two ways below:
 
 ##### Running Cli Command
 The tool comes with a executable script located in `vendor/bin/data-importer`. Here are some use cases with cli command:
-```
+```bash
 # clean all tables configured as operational_tables
-$ vendor/bin/data-importer cleanup --context=operational_tables
+vendor/bin/data-importer cleanup --context=operational_tables
 # clean all tables in database
-$ vendor/bin/data-importer cleanup --context=all
+vendor/bin/data-importer cleanup --context=all
 ```
 
-```
+```bash
 # export table schemas
-$ vendor/bin/data-importer export --table-schemas=true
+vendor/bin/data-importer export --table-schemas=true
 # export fixed_tables data
-$ vendor/bin/data-importer export --fixed-tables=true
+vendor/bin/data-importer export --fixed-tables=true
 # export all data within posts topic for posts id IN (100,101,1002) 
-$ vendor/bin/data-importer export --topic=posts --ids=100,101,102
+vendor/bin/data-importer export --topic=posts --ids=100,101,102
 # export everything (good for initializing the db for the first time
-$ vendor/bin/data-importer export --topic=posts --ids=100,101,102 --table-schemas=true --fixed-tables=true 
+vendor/bin/data-importer export --topic=posts --ids=100,101,102 --table-schemas=true --fixed-tables=true 
 ```
 
 ##### Using It In Your Application
