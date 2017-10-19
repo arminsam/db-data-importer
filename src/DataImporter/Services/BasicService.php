@@ -107,7 +107,7 @@ class BasicService
     {
         $config = null;
 
-        foreach ([__DIR__.'/../../../test/di_config.php', __DIR__.'/../../../../di_config.php', __DIR__.'/../../../di_config.php'] as $file) {
+        foreach ([__DIR__.'/../../../../../../di_config.php', __DIR__.'/../../../test/di_config.php', __DIR__.'/../../../di_config.php'] as $file) {
             if (file_exists($file)) {
                 $config = $file;
                 break;

@@ -1,6 +1,7 @@
 {
   "name": "arminsam/db-data-importer",
   "description": "A handy tool to import selective data from production database into you local environment db",
+  "keywords": ["database", "import", "export"],
   "license": "MIT",
   "authors": [
     {
