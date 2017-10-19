@@ -15,12 +15,19 @@ class DataImporterClient
      * @param bool $tableSchema
      * @param bool $fixedTables
      * @param string $filePath
+     * @param bool $quiet
      * @return $this
      */
-    public function export(string $topic = '', array $ids = [], bool $tableSchema = false, bool $fixedTables = false, string $filePath = '')
-    {
+    public function export(
+        string $topic = '',
+        array $ids = [],
+        bool $tableSchema = false,
+        bool $fixedTables = false,
+        string $filePath = '',
+        bool $quiet = true
+    ) {
         try {
-            $exportService = new ExportService($filePath);
+            $exportService = new ExportService($filePath, $quiet);
             $exportService
                 ->addHeaderContent()
                 ->createTableSchemas($tableSchema)
@@ -36,12 +43,13 @@ class DataImporterClient
 
     /**
      * @param string $filePath
+     * @param bool $quiet
      * @return $this
      */
-    public function import(string $filePath = '')
+    public function import(string $filePath = '', bool $quiet = true)
     {
         try {
-            $importService = new ImportService($filePath);
+            $importService = new ImportService($filePath, $quiet);
             $importService->import();
         } catch (Exception $e) {
             echo 'Error! ' . $e->getMessage() . PHP_EOL;
@@ -53,12 +61,13 @@ class DataImporterClient
 
     /**
      * @param string $context
+     * @param bool $quiet
      * @return $this
      */
-    public function cleanup(string $context = 'operational_tables')
+    public function cleanup(string $context = 'operational_tables',  bool $quiet = true)
     {
         try {
-            $cleanupService = new CleanupService();
+            $cleanupService = new CleanupService($quiet);
             $cleanupService->removeData($context);
         } catch (Exception $e) {
             echo 'Error! ' . $e->getMessage() . PHP_EOL;

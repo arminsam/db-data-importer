@@ -20,6 +20,8 @@ class DataImporterCli
         ]
     ];
 
+    private $quiet = false;
+
     public function run()
     {
         $command = $this->getAction($_SERVER['argv']);
@@ -133,14 +135,14 @@ class DataImporterCli
             $context = 'operational_tables';
         }
 
-        $client->cleanup($context);
+        $client->cleanup($context, $this->quiet);
     }
 
     private function executeImportCommand($options)
     {
         $client = new DataImporterClient();
         $filePath = isset($options['path']) ? $options['path'] : '';
-        $client->import($filePath);
+        $client->import($filePath, $this->quiet);
     }
 
     private function executeExportCommand($options)
@@ -151,6 +153,6 @@ class DataImporterCli
         $tableSchema = isset($options['table-schema']) ? $options['table-schema'] : false;
         $fixedTables = isset($options['fixed-tables']) ? $options['fixed-tables'] : false;
         $filePath = isset($options['path']) ? $options['path'] : '';
-        $client->export($topic, $ids, $tableSchema, $fixedTables, $filePath);
+        $client->export($topic, $ids, $tableSchema, $fixedTables, $filePath, $this->quiet);
     }
 }

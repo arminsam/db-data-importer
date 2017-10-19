@@ -36,6 +36,11 @@ class BasicService
     protected $tablesTreeMap;
 
     /**
+     * @var bool
+     */
+    protected $quiet;
+
+    /**
      * @param string $mode : 'export' | 'import'
      * @param string $filePath
      */
@@ -121,8 +126,7 @@ class BasicService
         }
 
         if (! $config) {
-            echo 'Unable to find the config file.' . PHP_EOL;
-            die();
+            throw new Exception('Unable to find the config file.');
         }
 
         $this->config = require $config;

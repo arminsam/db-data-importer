@@ -8,10 +8,12 @@ class ExportService extends BasicService
 {
     /**
      * @param string $exportPath
+     * @param bool $quiet
      */
-    public function __construct(string $exportPath = '')
+    public function __construct(string $exportPath = '', bool $quiet = true)
     {
         parent::__construct('export', $exportPath);
+        $this->quiet = $quiet;
     }
 
     /**
@@ -28,9 +30,9 @@ class ExportService extends BasicService
 
         $lines = [];
 
-        echo "[x] EXPORTING TABLE SCHEMAS" . PHP_EOL;
+        echo $this->quiet ? '' : '[x] EXPORTING TABLE SCHEMAS' . PHP_EOL;
         foreach ($this->tables as $table) {
-            echo "Exporting table schema for {$table}" . PHP_EOL;
+            echo $this->quiet ? '' : "Exporting table schema for {$table}" . PHP_EOL;
             $query = "SHOW CREATE TABLE {$table}";
             $createTableStatement = $this->executeQuery($query)[0]['Create Table'];
             $createTableStatement = str_replace('CREATE TABLE', 'CREATE TABLE IF NOT EXISTS', $createTableStatement);
@@ -38,7 +40,7 @@ class ExportService extends BasicService
         }
 
         $this->writeToFile($lines);
-        echo "[✓] EXPORTING TABLE SCHEMAS FINISHED" . PHP_EOL. PHP_EOL;
+        echo $this->quiet ? '' : '[✓] EXPORTING TABLE SCHEMAS FINISHED' . PHP_EOL. PHP_EOL;
 
         return $this;
     }
@@ -113,11 +115,11 @@ class ExportService extends BasicService
 
         $fixedTables = $this->config['fixed_tables'];
 
-        echo "[x] EXPORTING FIXED TABLES DATA" . PHP_EOL;
+        echo $this->quiet ? '' : '[x] EXPORTING FIXED TABLES DATA' . PHP_EOL;
         foreach ($fixedTables as $tableName => $config) {
             $this->export($this->tablesTreeMap[$tableName], 'fixed');
         }
-        echo "[✓] EXPORTING FIXED TABLES DATA FINISHED" . PHP_EOL . PHP_EOL;
+        echo $this->quiet ? '' : '[✓] EXPORTING FIXED TABLES DATA FINISHED' . PHP_EOL . PHP_EOL;
     }
 
     /**
@@ -132,10 +134,10 @@ class ExportService extends BasicService
             return;
         }
 
-        echo "[x] EXPORTING OPERATIONAL TABLES DATA" . PHP_EOL;
+        echo $this->quiet ? '' : '[x] EXPORTING OPERATIONAL TABLES DATA' . PHP_EOL;
         $this->tablesTreeMap[$topic]->ids = $ids;
         $this->export($this->tablesTreeMap[$topic], 'operational');
-        echo '[✓] EXPORTING OPERATIONAL TABLES DATA FINISHED' . PHP_EOL . PHP_EOL;
+        echo $this->quiet ? '' : '[✓] EXPORTING OPERATIONAL TABLES DATA FINISHED' . PHP_EOL . PHP_EOL;
     }
 
     /**
@@ -145,7 +147,7 @@ class ExportService extends BasicService
     protected function export(Table $table, string $type)
     {
         if ($type == 'operational' && empty($table->ids)) {
-            echo "Table {$table->name} has no exportable id" . PHP_EOL;
+            echo $this->quiet ? '' : "Table {$table->name} has no exportable id" . PHP_EOL;
             return;
         }
 
@@ -158,7 +160,7 @@ class ExportService extends BasicService
             $table = $refTable;
         }
 
-        echo "Exporting table {$table->name}" . PHP_EOL;
+        echo $this->quiet ? '' : "Exporting table {$table->name}" . PHP_EOL;
         $query = $this->createSelectQuery($table);
         $table->data = $this->executeQuery($query, $table->ids);
         $table->setChildrenIds();

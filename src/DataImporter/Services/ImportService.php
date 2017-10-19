@@ -2,14 +2,18 @@
 
 namespace DataImporter\Services;
 
+use Exception;
+
 class ImportService extends BasicService
 {
     /**
      * @param string $importPath
+     * @param bool $quiet
      */
-    public function __construct(string $importPath = '')
+    public function __construct(string $importPath = '', bool $quiet = true)
     {
         parent::__construct('import', $importPath);
+        $this->quiet = $quiet;
     }
 
     /**
@@ -18,14 +22,13 @@ class ImportService extends BasicService
     public function import()
     {
         if (! file_exists($this->file)) {
-            echo "Import file {$this->file} cannot be found." . PHP_EOL;
-            die();
+            throw new Exception("Import file {$this->file} cannot be found.");
         }
 
         $query = '';
         $lines = file($this->file);
 
-        echo "[x] IMPORTING TABLE DATA" . PHP_EOL;
+        echo $this->quiet ? '' : '[x] IMPORTING TABLE DATA' . PHP_EOL;
         foreach ($lines as $line) {
             if (substr($line, 0, 2) == '--' || trim($line) == '') {
                 continue;
@@ -37,13 +40,13 @@ class ImportService extends BasicService
                 if (substr($query, 0, 11) == 'LOCK TABLES') {
                     $tableName = explode(' ', $query);
                     $tableName = trim($tableName[2], '`');
-                    echo 'Importing table ' . $tableName . PHP_EOL;
+                    echo $this->quiet ? '' : 'Importing table ' . $tableName . PHP_EOL;
                 }
                 $this->executeQuery($query, [], false);
                 $query = '';
             }
         }
 
-        echo '[✓] IMPORT FINISHED' . PHP_EOL . PHP_EOL;
+        echo $this->quiet ? '' : '[✓] IMPORT FINISHED' . PHP_EOL . PHP_EOL;
     }
 }
