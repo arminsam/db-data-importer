@@ -8,12 +8,15 @@ class DataImporterCli
         'cleanup' => [
             'context' => ['operational_tables', 'fixed_tables', 'all']
         ],
-        'import' => [],
+        'import' => [
+            'path' => []
+        ],
         'export' => [
             'topic' => [],
             'ids' => [],
             'table-schema' => ['true', 'false'],
-            'fixed-tables' => ['true', 'false']
+            'fixed-tables' => ['true', 'false'],
+            'path' => []
         ]
     ];
 
@@ -41,6 +44,7 @@ class DataImporterCli
         $tmpOptions[] = isset($argv[3]) ? $this->getOption($argv[3]) : null;
         $tmpOptions[] = isset($argv[4]) ? $this->getOption($argv[4]) : null;
         $tmpOptions[] = isset($argv[5]) ? $this->getOption($argv[5]) : null;
+        $tmpOptions[] = isset($argv[6]) ? $this->getOption($argv[6]) : null;
 
         foreach ($tmpOptions as $option) {
             if (is_null($option)) {
@@ -135,7 +139,8 @@ class DataImporterCli
     private function executeImportCommand($options)
     {
         $client = new DataImporterClient();
-        $client->import();
+        $filePath = isset($options['path']) ? $options['path'] : '';
+        $client->import($filePath);
     }
 
     private function executeExportCommand($options)
@@ -145,6 +150,7 @@ class DataImporterCli
         $ids = isset($options['ids']) ? explode(',', str_replace(' ', '',$options['ids'])) : [];
         $tableSchema = isset($options['table-schema']) ? $options['table-schema'] : false;
         $fixedTables = isset($options['fixed-tables']) ? $options['fixed-tables'] : false;
-        $client->export($topic, $ids, $tableSchema, $fixedTables);
+        $filePath = isset($options['path']) ? $options['path'] : '';
+        $client->export($topic, $ids, $tableSchema, $fixedTables, $filePath);
     }
 }
