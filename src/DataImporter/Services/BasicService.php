@@ -55,7 +55,13 @@ class BasicService
      * @param string $path
      */
     protected function setExportFile(string $mode, string $path) {
-        $this->file = empty($path) ? $this->config['export_path'] : $path;
+        if (! empty($path)) {
+            $this->file = $path;
+        } elseif (file_exists(__DIR__.'/../../../../../../di_export.sql')) {
+            $this->file = __DIR__.'/../../../../../../di_export.sql';
+        } else {
+            $this->file = $this->config['export_path'];
+        }
 
         if ($mode == 'export' && file_exists($this->file)) {
             unlink($this->file);

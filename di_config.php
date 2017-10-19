@@ -15,11 +15,11 @@ return [
 
     // the database to use for importing data into
     'import_database' => [
-        'host'      => 'local-db-host',
-        'database'  => 'local-db-name',
-        'username'  => 'local-db-username',
-        'port'      => 'local-db-port',
-        'password'  => 'local-db-password'
+        'host'      => 'localhost',
+        'database'  => 'homestead',
+        'username'  => 'homestead',
+        'port'      => '3306',
+        'password'  => 'secret'
     ],
 
     // tables to be ignored in your database (you need only their schema)
