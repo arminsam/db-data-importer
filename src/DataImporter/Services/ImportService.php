@@ -17,6 +17,11 @@ class ImportService extends BasicService
      */
     public function import()
     {
+        if (! file_exists($this->file)) {
+            echo "Import file {$this->file} cannot be found." . PHP_EOL;
+            die();
+        }
+
         $query = '';
         $lines = file($this->file);
 
