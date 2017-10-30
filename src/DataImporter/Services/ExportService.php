@@ -3,6 +3,7 @@
 namespace DataImporter\Services;
 
 use DataImporter\TableNodes\Table;
+use InvalidArgumentException;
 
 class ExportService extends BasicService
 {
@@ -130,9 +131,7 @@ class ExportService extends BasicService
      */
     protected function exportOperationalTablesData(string $topic, array $ids)
     {
-        if (empty(trim($topic)) || empty($ids)) {
-            return;
-        }
+        $this->validateExportArgs($topic, $ids);
 
         echo $this->quiet ? '' : '[x] EXPORTING OPERATIONAL TABLES DATA' . PHP_EOL;
         $this->tablesTreeMap[$topic]->ids = $ids;
@@ -232,5 +231,26 @@ class ExportService extends BasicService
         }
 
         fclose($exportFile);
+    }
+
+    /**
+     * Validate both topic and ids arguments for the export command.
+     *
+     * @param string $topic
+     * @param array $ids
+     */
+    protected function validateExportArgs(string $topic, array $ids)
+    {
+        if (empty($topic) || empty($this->tablesTreeMap[$topic])) {
+            throw new InvalidArgumentException(
+                "The given topic is invalid. Look in the configuration file for valid topics."
+            );
+        }
+
+        if (empty($ids)) {
+            throw new InvalidArgumentException(
+                "You need to provide a comma-separated list of ids, which you want to export for the given topic."
+            );
+        }
     }
 }

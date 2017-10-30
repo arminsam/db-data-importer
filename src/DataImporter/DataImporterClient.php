@@ -35,7 +35,7 @@ class DataImporterClient
                 ->addFooterContent();
         } catch (Exception $e) {
             echo 'Error! ' . $e->getMessage() . PHP_EOL;
-            die();
+            exit(1);
         }
 
         return $this;

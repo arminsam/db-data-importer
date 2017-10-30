@@ -2,8 +2,13 @@
 
 namespace DataImporter;
 
+use Exception;
+
 class DataImporterCli
 {
+    /**
+     * @var array
+     */
     private $supportedActions = [
         'cleanup' => [
             'context' => ['operational_tables', 'fixed_tables', 'all']
@@ -20,26 +25,47 @@ class DataImporterCli
         ]
     ];
 
+    /**
+     * @var bool
+     */
     private $quiet = false;
 
+    /**
+     * Evaluate and execute the given command.
+     */
     public function run()
     {
-        $command = $this->getAction($_SERVER['argv']);
-        $options = $this->getOptions($command, $_SERVER['argv']);
-        $this->execute($command, $options);
+        try {
+            $command = $this->getAction($_SERVER['argv']);
+            $options = $this->getOptions($command, $_SERVER['argv']);
+            $this->execute($command, $options);
+        } catch (Exception $e) {
+            echo 'Error! ' . $e->getMessage() . PHP_EOL;
+            exit(1);
+        }
     }
 
-    private function getAction($argv)
+    /**
+     * @param array $argv
+     * @return string
+     * @throws Exception
+     */
+    private function getAction(array $argv)
     {
         if (! isset($argv[1]) || ! in_array($argv[1], array_keys($this->supportedActions))) {
-            echo 'Unknown command! Supported commands: ' . implode(', ', array_keys($this->supportedActions)) . PHP_EOL;
-            exit(1);
+            throw new Exception('Unknown command! Supported commands: '
+                . implode(', ', array_keys($this->supportedActions)));
         }
 
         return $argv[1];
     }
 
-    private function getOptions($command, $argv)
+    /**
+     * @param string $command
+     * @param array $argv
+     * @return array
+     */
+    private function getOptions(string $command, array $argv)
     {
         $options = [];
         $tmpOptions[] = isset($argv[2]) ? $this->getOption($argv[2]) : null;
@@ -60,19 +86,27 @@ class DataImporterCli
         return $options;
     }
 
-    private function getOption($str)
+    /**
+     * @param string $arg
+     * @return array
+     * @throws Exception
+     */
+    private function getOption(string $arg)
     {
-        $option = explode('=', ltrim($str, '--'));
+        $option = explode('=', ltrim($arg, '--'));
 
         if (count($option) < 2) {
-            echo 'Invalid option > ' . $str . PHP_EOL;
-            exit(1);
+            throw new Exception("Invalid option -- {$arg}.");
         }
 
         return ['name' => $option[0], 'value' => $option[1]];
     }
 
-    private function validateOptions($command, $options)
+    /**
+     * @param string $command
+     * @param array $options
+     */
+    private function validateOptions(string $command, array $options)
     {
         $maxOptionCount = count($this->supportedActions[$command]);
         $this->validateMaxOptionCount($command, $options, $maxOptionCount);
@@ -82,39 +116,58 @@ class DataImporterCli
         }
     }
 
-    private function validateMaxOptionCount($command, $options, $maxCount)
+    /**
+     * @param string $command
+     * @param array $options
+     * @param int $maxCount
+     * @throws Exception
+     */
+    private function validateMaxOptionCount(string $command, array $options, int $maxCount)
     {
         if (count($options) > $maxCount) {
-            echo 'Invalid number of options given. ';
+            $message = 'Invalid number of options given. ';
             if (count($this->supportedActions[$command]) > 0) {
-                echo 'Supported options: ' . implode(', ', array_keys($this->supportedActions[$command]));
+                $message .= 'Supported options: ' . implode(', ', array_keys($this->supportedActions[$command]));
             }
-            echo PHP_EOL;
-            exit(1);
+            throw new Exception($message);
         }
     }
 
-    private function validateOptionName($command, $optionName)
+    /**
+     * @param string $command
+     * @param string $optionName
+     * @throws Exception
+     */
+    private function validateOptionName(string $command, string $optionName)
     {
         if (! in_array($optionName, array_keys($this->supportedActions[$command]))) {
-            echo 'Invalid option --' . $optionName . PHP_EOL;
-            exit(1);
+            throw new Exception("Invalid option -- {$optionName}.");
         }
     }
 
-    private function validateOptionValue($command, $optionName, $optionValue)
+    /**
+     * @param string $command
+     * @param string $optionName
+     * @param string $optionValue
+     * @throws Exception
+     */
+    private function validateOptionValue(string $command, string $optionName, string $optionValue)
     {
         if (empty($this->supportedActions[$command][$optionName])) {
             return;
         }
         if (! in_array($optionValue, $this->supportedActions[$command][$optionName])) {
-            echo 'Invalid value given for --' . $optionName . '. Supported values: '
-                . implode(', ', $this->supportedActions[$command][$optionName]) . PHP_EOL;
-            exit(1);
+            $message = 'Invalid value given for --' . $optionName . '. Supported values: '
+                . implode(', ', $this->supportedActions[$command][$optionName]);
+            throw new Exception($message);
         }
     }
 
-    private function execute($command, $options)
+    /**
+     * @param string $command
+     * @param array $options
+     */
+    private function execute(string $command, array $options)
     {
         switch ($command) {
             case 'cleanup' : $this->executeCleanupCommand($options); break;
@@ -123,7 +176,10 @@ class DataImporterCli
         }
     }
 
-    private function executeCleanupCommand($options)
+    /**
+     * @param array $options
+     */
+    private function executeCleanupCommand(array $options)
     {
         $client = new DataImporterClient();
         $context = '';
@@ -138,17 +194,23 @@ class DataImporterCli
         $client->cleanup($context, $this->quiet);
     }
 
-    private function executeImportCommand($options)
+    /**
+     * @param array $options
+     */
+    private function executeImportCommand(array $options)
     {
         $client = new DataImporterClient();
         $filePath = isset($options['path']) ? $options['path'] : '';
         $client->import($filePath, $this->quiet);
     }
 
-    private function executeExportCommand($options)
+    /**
+     * @param array $options
+     */
+    private function executeExportCommand(array $options)
     {
         $client = new DataImporterClient();
-        $topic = isset($options['topic']) ? $options['topic'] : '';
+        $topic = isset($options['topic']) ? trim($options['topic']) : '';
         $ids = isset($options['ids']) ? explode(',', str_replace(' ', '',$options['ids'])) : [];
         $tableSchema = isset($options['table-schema']) ? $options['table-schema'] : false;
         $fixedTables = isset($options['fixed-tables']) ? $options['fixed-tables'] : false;
