@@ -10,7 +10,8 @@ return [
         'database'  => 'production-db-name',
         'username'  => 'production-db-username',
         'port'      => 'production-db-port',
-        'password'  => 'production-db-password'
+        'password'  => 'production-db-password',
+        'options'   => []
     ],
 
     // the database to use for importing data into
@@ -19,7 +20,8 @@ return [
         'database'  => 'homestead',
         'username'  => 'homestead',
         'port'      => '3306',
-        'password'  => 'secret'
+        'password'  => 'secret',
+        'options'   => []
     ],
 
     // tables to be ignored in your database (you need only their schema)

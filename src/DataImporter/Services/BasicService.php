@@ -230,7 +230,8 @@ class BasicService
         $host = $this->config["{$mode}_database"]["host"];
         $port = $this->config["{$mode}_database"]["port"];
         $db = $this->config["{$mode}_database"]["database"];
-        $this->connection = new PDO("mysql:dbname={$db};host={$host};port={$port}", $username, $password);
+        $options = $this->config["{$mode}_database"]["options"];
+        $this->connection = new PDO("mysql:dbname={$db};host={$host};port={$port}", $username, $password, $options);
         $this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     }
 }
